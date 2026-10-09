@@ -1,0 +1,227 @@
+---
+title: "Data Viz Assignment"
+author: Sam Schellenberg-Ruland
+date: today
+format: 
+    html:
+      toc: true
+      code-fold: true
+      code-summary: "Show code"
+      df-print: paged
+execute:
+    echo: false
+    warning: false
+---
+
+```{r, load libraries}
+#| output: FALSE
+
+library(tidyverse)
+library(janitor)
+library(patchwork)
+library(paletteer)
+
+```
+
+```{r, load files}
+#| output: FALSE
+
+episode_data <- read.csv("./drwho_episodes.csv")
+```
+
+```{r, data cleaning}
+#| output: FALSE
+
+data_clean <- episode_data |>
+  rename(episode = "episode_number",
+         season = "season_number",
+         viewers = "uk_viewers")|>
+  select(type, season, episode, viewers, rating, episode_title) |>
+  mutate(index = row_number()) |>
+  mutate(doctor = case_when(index > 0 & index <= 13 ~ "Ninth Doctor",
+                            index > 13 & index <= 60 ~ "Tenth Doctor",
+                            index > 60 & index <= 104 ~ "Eleventh Doctor",
+                            index > 104 & index <= 144 ~ "Twelfth Doctor",
+                            index > 144 & index <= 175 ~ "Thirteenth Doctor",
+                            TRUE ~ "Other")) |>
+  mutate(doctor = factor(doctor,
+                         levels = c("Ninth Doctor", "Tenth Doctor", "Eleventh Doctor", "Twelfth Doctor", "Thirteenth Doctor")))|>
+  mutate(adj_rating = rating / 10)
+
+
+
+```
+
+## Story Summary
+
+While the modern era of Doctor Who was very popular upon release, after 13 seasons, its viewership rates have been declining. However, this decline has not been completely uniform, with spikes in popularity occurring periodically.
+
+To understand what factors may have impacted the decline of the series, I organized the episodes of the series by who the Doctor was at the time, and compared viewership trends between each Doctor.
+
+From this analysis, each doctor had their own clear pattern of viewership over time. The Tenth and Eleventh Doctors had relatively consistent high viewership rates. By contrast, the Twelfth and Thirteenth Doctors started out with high viewership, which dropped off dramatically over time. As these were the final two Doctors of the modern era, their presence in the show corresponds with the overall decline in the popularity of the series. Thus, the decline in popularity of Doctor Who may be related to the back-to-back runs of two unpopular Doctors.
+
+## Version A: Scientific Article
+
+The modern era of Doctor Who consists of 175 episodes spanning 13 seasons. While this television series has reached high levels of popularity, there has been a notable decline in viewership as the series has progressed, see Figure 1.
+
+```{r, part one, graph one}
+#| output: TRUE
+
+overall_decline_graph <- ggplot(data_clean, aes(x = index, y = viewers)) +
+  geom_smooth(se = TRUE, colour = "black") +
+  geom_point(alpha = 0.5, colour = "black") +
+  labs(title = "UK Viewership across the Modern Era of Doctor Who",
+       caption = "Figure 1: Relationship between chronological episode number (n = 175) and UK viewership. Each point represents the number of \nUK viewers for an individual episode. The data has been fitted with a LOESS smoothed estimate of the relationship between \nviewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
+  xlab("Chronological Episode Number")+
+  ylab("Number of UK Viewers (Millions)") +
+  scale_y_continuous(limits = c(0,14),
+                     breaks = seq(0, 14, by = 1),
+                     minor_breaks = NULL)+
+  scale_x_continuous(breaks = seq(0, 175, by = 20))+
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(
+      hjust = 0,
+      colour = "black"))
+
+overall_decline_graph
+
+
+```
+
+From this graph, we can see that as the series has progressed, viewership has begun to trend downwards. However, this decline has not been uniform. The decline in viewership only began in the latter half of the series, and there are many peaks in the data that are not well captured by the trendline.
+
+To better understand these variations in viewers, one significant factor that we can consider is that the actor playing the lead character (the Doctor) sometimes changes between seasons. In the modern era, there have been five distinct Doctors, and the viewerbase may have had differing opinions of each one. We investigate the potential relationship between the viewership trends and the different Doctors in Figure 2.
+
+```{r, part one, graph two}
+
+doctor_trends <- ggplot(data_clean, aes(x = index, y = viewers))+
+  geom_smooth(se = TRUE, aes(group = factor(doctor)), colour = "black", fill = "grey80")+
+  geom_point(alpha = 0.5) +
+  labs(title = "UK Viewership Trends by Doctor",
+       caption = "Figure 2. Relationship between chronological episode number and UK viewership, split across iterations of the doctor. Each point represents the number of \nUK viewers for an individual episode. For each iteration of the doctor, the data has been fitted with a LOESS smoothed estimate of the relationship \nbetween viewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
+  xlab("Chronological Episode Number")+
+  ylab("Number of UK Viewers (Millions)")+
+  geom_text(aes(x = 2, y = 2, label = "Ninth \n Doctor \n (Ep 1-13)"), colour = "black")+
+  geom_text(aes(x = 37, y = 2, label = "Tenth \n Doctor \n (Ep 14-60)"), colour = "black") +
+  geom_text(aes(x = 82.5, y = 2, label = "Eleventh \n Doctor \n (Ep 61-104)"), colour = "black") +
+  geom_text(aes(x = 124.5, y = 2, label = "Twelfth \n Doctor \n (Ep 105-144)"), colour = "black")+
+  geom_text(aes(x = 164.5, y = 2, label = "Thirteenth \n Doctor \n (Ep 145-175)"), colour = "black") +
+  scale_y_continuous(limits = c(0,14),
+                     breaks = seq(0, 14, by = 1),
+                     minor_breaks = NULL) +
+  scale_x_continuous(limits = c(0, 175),
+                     breaks = seq(0, 175, by = 20))+
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(
+      hjust = 0,
+      colour = "black"))
+
+doctor_trends
+
+```
+
+In this figure, we can see that the patterns of viewership look very different between the different Doctors. Viewership decreased for the Ninth Doctor. Viewership remained steady or increased for the Tenth and Eleventh Doctors. Viewership started out high but declined steeply for the Twelfth and Thirteenth Doctors.
+
+In sum, the decline of viewership across the modern era of Doctor Who has not occurred steadily. Instead, trends have varied between iterations of the Doctor, with the overall decline of the program roughly coinciding with the eras of the Twelfth and Thirteenth Doctors.
+
+## Version B: Accessible / Dynamic Outlet
+
+The modern era of Doctor Who is an iconic British television program that began in 2005. While the series was highly successful at its peak, viewership has been steadily declining in recent years.
+
+```{r, part two, graph 1}
+#| output: TRUE
+
+season_summary <- data_clean |>
+  filter(type == "episode") |>
+  group_by(season)|>
+  summarise(avg_view = mean(viewers),
+            avg_rate = mean(rating),
+            avg_adj_rate = mean(adj_rating),
+            doctor = first(doctor))|>
+  ungroup()
+
+season_graph <- ggplot(season_summary, aes(x = factor(season), y = avg_view))+
+  geom_col(aes(fill = factor(season)))+
+  labs(title = "Doctor Who's Popularity is Decreasing")+
+  xlab("Season Number")+
+  ylab("Average Number of UK Viewers per Episode (Millions)")+
+  theme(legend.position = "none") +
+  scale_y_continuous(limits = c(0,10)) 
+
+season_graph
+
+
+
+```
+
+In this graph, we can observe the decline in viewership by looking at how the average number of UK viewers changes across the seasons of Doctor Who. The early seasons of the show had a steady number of viewers (with seasons 1-8 consistently reaching an average of 7.5 million viewers per episode). By the later seasons of the show, viewership began to drop off dramatically, with season 13 only getting an average of 4.76 million viewers per episode.
+
+However, from this graph we can also see that the decline in viewership hasn’t been perfectly smooth. Across the series, some seasons have unexpectedly high rates of viewership that aren’t consistent with a general decline in the program’s popularity.
+
+One aspect of Doctor Who that might be relevant to understanding these peaks in viewership is the concept of “regeneration”. In Doctor Who, the lead character periodically regenerates into a new physical form, who is portrayed by a new actor. For example, the Tenth Doctor (portrayed by David Tennant) regenerated into the Eleventh Doctor (portrayed by Matt Smith) at the end of season four. 
+
+Let’s consider how regeneration across the seasons corresponds with average viewership.
+
+```{r, part two, graph two}
+
+#| output: TRUE
+
+season_summary <- data_clean |>
+  filter(type == "episode") |>
+  group_by(season)|>
+  summarise(avg_view = mean(viewers),
+            avg_rate = mean(rating),
+            avg_adj_rate = mean(adj_rating),
+            doctor = first(doctor))|>
+  ungroup()
+
+season_by_doctor_graph <- ggplot(season_summary, aes(x = factor(season), y = avg_view))+
+  geom_col(aes(fill = factor(doctor)))+
+  labs(title = "The Popularity of Doctor Who across Regenerations")+
+  xlab("Season Number")+
+  ylab("Average Number of UK Viewers per Episode (Millions)") +
+  scale_y_continuous(limits = c(0,10)) +
+  scale_fill_discrete(
+    name = "Regeneration")
+season_by_doctor_graph
+
+```
+
+In this graph, we’ve broken up the seasons into different colours, each of which corresponds to a different regeneration of the Doctor. Here, we can see that each Doctor has their own self-contained viewership trend. The Tenth and Eleventh Doctors had relatively high and consistent average viewership numbers across their seasons. By contrast, the Twelfth and Thirteenth Doctors both started with high viewership, but their popularity dropped off dramatically over time.
+
+We can further simplify this data by looking at the average viewership for each Doctor, across all of their seasons.
+
+```{r, part two, graph three}
+summary_by_doctor <- data_clean |>
+  group_by(doctor) |>
+  summarise(doctor_rate = mean(rating),
+            doctor_view = mean(viewers))
+
+doctor_summary <- ggplot(summary_by_doctor, aes(x = doctor))+
+  geom_col(aes(y = doctor_view, fill = factor(doctor))) +
+  coord_cartesian(ylim = c(0, 10)) +
+  labs(title = "Overall Popularity across Regenerations")+
+  xlab("Regeneration") +
+  ylab("Average Number of UK Viewers per Episode (Millions)") +
+  theme_minimal() +
+  theme(legend.position = "none") 
+doctor_summary
+
+```
+
+Again, this allows us to contrast the relatively high average viewership of the Ninth, Tenth and Eleventh Doctors with the less popular Twelfth and Thirteenth Doctors.
+
+In conclusion, the decline of the popularity of Doctor Who has not been steady across the seasons. Instead, it has roughly corresponded with who the current iteration of the Doctor was, with steady declines appearing only during the tenures of the Twelfth and Thirteenth Doctors. Note, however, that the current Doctor is only one part of the story, as the writers, producers, and supporting casts also changed across the different seasons.
+
+## Data / Source Note
+
+The dataset used in this project was sourced from Tidy Tuesday (the 2021-11-23 project). I used the episodes dataset, which was made by Jonathan Kitt as part of the datardis R package. It was compiled from Wikipedia’s list of Doctor Who episodes. 
+
+The dataset does not span the entire modern era of Doctor Who, as two more seasons were released after the data was compiled. 
+
+In my analysis, I added a column to the file called “index”, which numbered every episode in the dataset based on the order of release. Based on this index, I also added a column defining who the current Doctor was in the show, this information I also sourced from Wikipedia.
+
+```{}
+```
