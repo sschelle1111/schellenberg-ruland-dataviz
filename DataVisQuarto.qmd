@@ -56,9 +56,9 @@ data_clean <- episode_data |>
 
 While the modern era of Doctor Who was very popular upon release, after 13 seasons, its viewership rates have been declining. However, this decline has not been completely uniform, with spikes in popularity occurring periodically.
 
-To understand what factors may have impacted the decline of the series, I organized the episodes of the series by who the Doctor was at the time, and compared viewership trends between each Doctor.
+To understand what factors may have impacted the decline of the series, I organized the episodes of the series by who the lead character (the Doctor) was at the time. I then compared viewership trends between each Doctor.
 
-From this analysis, each doctor had their own clear pattern of viewership over time. The Tenth and Eleventh Doctors had relatively consistent high viewership rates. By contrast, the Twelfth and Thirteenth Doctors started out with high viewership, which dropped off dramatically over time. As these were the final two Doctors of the modern era, their presence in the show corresponds with the overall decline in the popularity of the series. Thus, the decline in popularity of Doctor Who may be related to the back-to-back runs of two unpopular Doctors.
+Within this analysis, each Doctor had their own clear pattern of viewership over time. The Tenth and Eleventh Doctors had relatively consistent high viewership rates. By contrast, the Twelfth and Thirteenth Doctors started out with high viewership, which dropped off dramatically over time. As these were the final two Doctors of the modern era, their presence in the show corresponds with the overall decline in the popularity of the series. Thus, the decline in popularity of Doctor Who may be related to the back-to-back runs of two unpopular Doctors.
 
 ## Version A: Scientific Article
 
@@ -71,7 +71,7 @@ overall_decline_graph <- ggplot(data_clean, aes(x = index, y = viewers)) +
   geom_smooth(se = TRUE, colour = "black") +
   geom_point(alpha = 0.5, colour = "black") +
   labs(title = "UK Viewership across the Modern Era of Doctor Who",
-       caption = "Figure 1: Relationship between chronological episode number (n = 175) and UK viewership. Each point represents the number of \nUK viewers for an individual episode. The data has been fitted with a LOESS smoothed estimate of the relationship between \nviewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
+       caption = "Figure 1: Relationship between chronological episode number (n = 175) and UK viewership. Each point represents the \nnumber of UK viewers for an individual episode. The data has been fitted with a LOESS smoothed estimate of the \nrelationship between viewership and episode number. The grey band shows the 95% confidence interval for the \nestimate.")+
   xlab("Chronological Episode Number")+
   ylab("Number of UK Viewers (Millions)") +
   scale_y_continuous(limits = c(0,14),
@@ -86,7 +86,6 @@ overall_decline_graph <- ggplot(data_clean, aes(x = index, y = viewers)) +
 
 overall_decline_graph
 
-
 ```
 
 From this graph, we can see that as the series has progressed, viewership has begun to trend downwards. However, this decline has not been uniform. The decline in viewership only began in the latter half of the series, and there are many peaks in the data that are not well captured by the trendline.
@@ -95,11 +94,12 @@ To better understand these variations in viewers, one significant factor that we
 
 ```{r, part one, graph two}
 
+
 doctor_trends <- ggplot(data_clean, aes(x = index, y = viewers))+
   geom_smooth(se = TRUE, aes(group = factor(doctor)), colour = "black", fill = "grey80")+
   geom_point(alpha = 0.5) +
   labs(title = "UK Viewership Trends by Doctor",
-       caption = "Figure 2. Relationship between chronological episode number and UK viewership, split across iterations of the doctor. Each point represents the number of \nUK viewers for an individual episode. For each iteration of the doctor, the data has been fitted with a LOESS smoothed estimate of the relationship \nbetween viewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
+       caption = "Figure 2. Relationship between chronological episode number and UK viewership, split across iterations of the Doctor. \nEach point represents the number of UK viewers for an individual episode. For each iteration of the doctor, the data \nhas been fitted with a LOESS smoothed estimate of the relationship between viewership and episode number. The grey \nband shows the 95% confidence interval for the estimate.")+
   xlab("Chronological Episode Number")+
   ylab("Number of UK Viewers (Millions)")+
   geom_text(aes(x = 2, y = 2, label = "Ninth \n Doctor \n (Ep 1-13)"), colour = "black")+
@@ -124,11 +124,11 @@ doctor_trends
 
 In this figure, we can see that the patterns of viewership look very different between the different Doctors. Viewership decreased for the Ninth Doctor. Viewership remained steady or increased for the Tenth and Eleventh Doctors. Viewership started out high but declined steeply for the Twelfth and Thirteenth Doctors.
 
-In sum, the decline of viewership across the modern era of Doctor Who has not occurred steadily. Instead, trends have varied between iterations of the Doctor, with the overall decline of the program roughly coinciding with the eras of the Twelfth and Thirteenth Doctors.
+In sum, the decline of viewership across the modern era of Doctor Who has not occurred steadily. Instead, trends have varied between iterations of the Doctor, with the overall decline of the program roughly coinciding with the eras of the Twelfth and Thirteenth Doctors. While no causal relationship can be drawn from this analysis, it is possible that the different portrayals of the Doctor have contributed to a decline in recent viewership.
 
 ## Version B: Accessible / Dynamic Outlet
 
-The modern era of Doctor Who is an iconic British television program that began in 2005. While the series was highly successful at its peak, viewership has been steadily declining in recent years.
+The modern era of Doctor Who, an iconic British television program, first aired in 2005. While the series was highly successful at its peak, viewership has been steadily declining in recent years.
 
 ```{r, part two, graph 1}
 #| output: TRUE
@@ -156,7 +156,7 @@ season_graph
 
 ```
 
-In this graph, we can observe the decline in viewership by looking at how the average number of UK viewers changes across the seasons of Doctor Who. The early seasons of the show had a steady number of viewers (with seasons 1-8 consistently reaching an average of 7.5 million viewers per episode). By the later seasons of the show, viewership began to drop off dramatically, with season 13 only getting an average of 4.76 million viewers per episode.
+In this graph, we can observe the decline in viewership by looking at how the average number of UK viewers changes across the seasons of Doctor Who. The early seasons of the show had a steady number of viewers (with seasons 1-6 consistently reaching an average of 7.5 million viewers per episode). By the later seasons of the show, viewership began to drop off dramatically, with season 13 only getting an average of 4.76 million viewers per episode.
 
 However, from this graph we can also see that the decline in viewership hasn’t been perfectly smooth. Across the series, some seasons have unexpectedly high rates of viewership that aren’t consistent with a general decline in the program’s popularity.
 

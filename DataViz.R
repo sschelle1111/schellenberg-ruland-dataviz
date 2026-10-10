@@ -35,7 +35,7 @@ overall_decline_graph <- ggplot(data_clean, aes(x = index, y = viewers)) +
   geom_smooth(se = TRUE, colour = "black") +
   geom_point(alpha = 0.5, colour = "black") +
   labs(title = "UK Viewership across the Modern Era of Doctor Who",
-       caption = "Figure 1: Relationship between chronological episode number (n = 175) and UK viewership. Each point represents the number of \nUK viewers for an individual episode. The data has been fitted with a LOESS smoothed estimate of the relationship between \nviewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
+       caption = "Figure 1: Relationship between chronological episode number (n = 175) and UK viewership. Each point represents the \nnumber of UK viewers for an individual episode. The data has been fitted with a LOESS smoothed estimate of the relationship \nbetween viewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
   xlab("Chronological Episode Number")+
   ylab("Number of UK Viewers (Millions)") +
   scale_y_continuous(limits = c(0,14),
@@ -58,7 +58,8 @@ doctor_trends <- ggplot(data_clean, aes(x = index, y = viewers))+
   geom_smooth(se = TRUE, aes(group = factor(doctor)), colour = "black", fill = "grey80")+
   geom_point(alpha = 0.5) +
   labs(title = "UK Viewership Trends by Doctor",
-       caption = "Figure 2. Relationship between chronological episode number and UK viewership, split across iterations of the doctor. Each point represents the number of \nUK viewers for an individual episode. For each iteration of the doctor, the data has been fitted with a LOESS smoothed estimate of the relationship \nbetween viewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
+       caption = "Figure 2. Relationship between chronological episode number and UK viewership, split across iterations of the Doctor. \n
+       Each point represents the number of UK viewers for an individual episode. For each iteration of the doctor, the data has been \nfitted with a LOESS smoothed estimate of the relationship between viewership and episode number. The grey band shows the 95% confidence interval for the estimate.")+
   xlab("Chronological Episode Number")+
   ylab("Number of UK Viewers (Millions)")+
   geom_text(aes(x = 2, y = 2, label = "Ninth \n Doctor \n (Ep 1-13)"), colour = "black")+
